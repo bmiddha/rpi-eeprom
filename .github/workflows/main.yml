@@ -1,0 +1,30 @@
+name: Build
+on: 
+  workflow_dispatch:
+    inputs:
+      firmware_status:
+        description: 'example: stable'     
+        required: true
+      pieeprom_version:
+        description: 'example: 2020-09-03'
+        required: true
+      vl805_version:
+        description: 'example: 000138a1'
+        required: true
+run-name: Build rpi-boot-eeprom-recovery-${{ inputs.pieeprom_version }}-vl805-${{ inputs.vl805_version }} by @${{ github.actor }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛎️ Check out repository code
+        uses: actions/checkout@v3
+      - name: 🍳 Make things
+        run: |
+          ./make-release ${{ inputs.firmware_status }} ${{ inputs.pieeprom_version }} ${{ inputs.vl805_version }} . release rpi-boot-eeprom-recovery
+        working-directory: ./imager
+      - name: ⬆️ Upload a Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: rpi-boot-eeprom-recovery-${{ inputs.pieeprom_version }}-vl805-${{ inputs.vl805_version }}
+          path: |
+            ./imager/release/*.zip
